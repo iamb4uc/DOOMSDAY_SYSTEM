@@ -1,0 +1,15 @@
+[submodule "StealthStreamTerminal"]
+	path = StealthStreamTerminal
+	url = https://github.com/iamb4uc/StealthStreamTerminal
+[submodule "dots"]
+	path = dots
+	url = https://github.com/iamb4uc/dots
+[submodule "vdwm"]
+	path = vdwm
+	url = https://github.com/iamb4uc/vdwm
+[submodule "dmenu"]
+	path = dmenu
+	url = https://github.com/iamb4uc/dmenu
+[submodule "slstatus"]
+	path = slstatus
+	url = https://github.com/iamb4uc/slstatus
