@@ -22,24 +22,31 @@ With no module flag, `install.sh` defaults to `--all`.
 
 ## Quick Start
 
+Straight install:
+
 ```sh
-git clone https://github.com/iamb4uc/DOOMSDAY_SYSTEM.git
-cd DOOMSDAY_SYSTEM
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh
 ```
 
 For unattended installs:
 
 ```sh
-./install.sh --yes --all
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --yes --all
 ```
 
 Install only selected modules:
 
 ```sh
-./install.sh --wm
-./install.sh --dots --sst
-./install.sh --slstatus --slock
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --wm
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --dots --sst
+```
+
+Local checkout:
+
+```sh
+git clone https://github.com/iamb4uc/DOOMSDAY_SYSTEM.git
+cd DOOMSDAY_SYSTEM
+./install.sh
 ```
 
 ## Installer Options
@@ -101,4 +108,3 @@ install.sh      installer for all modules
 ```
 
 The actual desktop configuration lives in the linked module repositories.
-
