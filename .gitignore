@@ -1,0 +1,17 @@
+# Local checkouts used while developing this meta-repo.
+/StealthStreamTerminal/
+/dmenu/
+/dots/
+/slock/
+/slstatus/
+/vdwm/
+
+# Installer scratch directories.
+/.doomsday-build/
+/build/
+/dist/
+
+# Suckless build outputs if a module is copied into the tree locally.
+*.o
+*.tar.gz
+
