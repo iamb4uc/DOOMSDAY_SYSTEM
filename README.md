@@ -1,5 +1,9 @@
 # DOOMSDAY_SYSTEM
 
+[![check](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml/badge.svg)](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml)
+![POSIX sh](https://img.shields.io/badge/shell-POSIX%20sh-222222)
+![X11](https://img.shields.io/badge/platform-X11-444444)
+
 A one-command installer for my X11 desktop stack.
 
 This repository is intentionally a meta-repo. It does not vendor the individual
@@ -59,6 +63,10 @@ cd DOOMSDAY_SYSTEM
 --slock                install slock
 --all                  install everything, also the default
 -y, --yes              run non-interactively
+--dry-run              print planned actions without changing the system
+--list                 list modules and exit
+--uninstall            uninstall selected modules
+--no-verify            skip post-install command verification
 --no-deps              skip package-manager dependency installation
 --no-update            do not git pull existing module checkouts
 --build-root DIR       clone/build modules under DIR
@@ -84,6 +92,36 @@ The installer knows how to install build dependencies on:
 
 Dependency installation can be skipped with `--no-deps` if the system is already
 prepared or if you prefer to install packages manually.
+
+Platform notes:
+
+- [Void Linux](docs/void.md)
+- [Debian and Ubuntu](docs/debian.md)
+- [Arch Linux](docs/arch.md)
+- [Fedora](docs/fedora.md)
+
+## Useful Commands
+
+Preview an install:
+
+```sh
+./install.sh --dry-run --all
+```
+
+List modules:
+
+```sh
+./install.sh --list
+```
+
+Uninstall selected modules:
+
+```sh
+./install.sh --uninstall --wm --sst
+```
+
+By default, the installer verifies selected command modules after install:
+`dmenu`, `vdwm`, `st`, `slstatus`, and `slock`.
 
 ## What It Changes
 
