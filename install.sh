@@ -22,6 +22,27 @@ SELECT_ANY=0
 SUDO=
 [ "$(id -u)" -eq 0 ] || SUDO=${SUDO:-sudo}
 
+can_write_prefix() {
+	target=$1
+
+	if [ ! -d "$target" ]; then
+		target=$(dirname "$target")
+	fi
+
+	while [ ! -d "$target" ] && [ "$target" != "/" ]; do
+		target=$(dirname "$target")
+	done
+
+	[ -d "$target" ] || return 1
+	probe=$target/.doomsday-write-test.$$
+	if ( : > "$probe" ) 2>/dev/null; then
+		rm -f "$probe"
+		return 0
+	fi
+
+	return 1
+}
+
 usage() {
 	cat <<EOF
 Usage: $PROGRAM [module] [options]
@@ -114,6 +135,15 @@ as_root() {
 	fi
 }
 
+with_install_privileges() {
+	if [ "$(id -u)" -eq 0 ] || can_write_prefix "$PREFIX"; then
+		run "$@"
+	else
+		need_cmd "$SUDO"
+		run "$SUDO" "$@"
+	fi
+}
+
 detect_package_manager() {
 	if command -v xbps-install >/dev/null 2>&1; then
 		printf '%s\n' xbps
@@ -189,7 +219,8 @@ install_make_project() {
 
 	log "Building and installing $name"
 	run make -C "$dir" clean
-	as_root make -C "$dir" PREFIX="$PREFIX" clean install
+	with_install_privileges mkdir -p "$PREFIX/share/terminfo"
+	with_install_privileges env TERMINFO="$PREFIX/share/terminfo" make -C "$dir" PREFIX="$PREFIX" clean install
 	run make -C "$dir" clean
 }
 
