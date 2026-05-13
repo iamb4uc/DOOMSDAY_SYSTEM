@@ -12,6 +12,10 @@ REPO_BASE=${REPO_BASE:-https://github.com/iamb4uc}
 ASSUME_YES=0
 INSTALL_DEPS=1
 UPDATE_REPOS=1
+DRY_RUN=0
+LIST_ONLY=0
+UNINSTALL=0
+VERIFY_AFTER=1
 SELECT_DOTS=0
 SELECT_WM=0
 SELECT_SST=0
@@ -60,6 +64,10 @@ Modules:
 
 Options:
   -y, --yes              Non-interactive mode; answer yes to prompts
+      --dry-run          Print planned actions without changing the system
+      --list             List modules and exit
+      --uninstall        Uninstall selected modules instead of installing
+      --no-verify        Skip post-install command verification
       --no-deps          Skip dependency installation
       --no-update        Do not git pull existing clones
       --build-root DIR   Clone/build repos under DIR
@@ -76,6 +84,8 @@ Examples:
   ./install.sh
   ./install.sh --yes
   ./install.sh --wm
+  ./install.sh --dry-run --all
+  ./install.sh --list
   ./install.sh --yes --dots --sst --no-deps
 EOF
 }
@@ -97,7 +107,7 @@ confirm() {
 	prompt=$1
 	default=${2:-y}
 
-	if [ "$ASSUME_YES" -eq 1 ]; then
+	if [ "$ASSUME_YES" -eq 1 ] || [ "$DRY_RUN" -eq 1 ]; then
 		return 0
 	fi
 
@@ -123,6 +133,9 @@ run() {
 		printf ' %s' "$arg"
 	done
 	printf '\n'
+	if [ "$DRY_RUN" -eq 1 ]; then
+		return 0
+	fi
 	"$@"
 }
 
@@ -159,6 +172,11 @@ detect_package_manager() {
 }
 
 install_dependencies() {
+	if [ "$DRY_RUN" -eq 1 ]; then
+		log "Would install build dependencies with $(detect_package_manager)"
+		return 0
+	fi
+
 	pm=$(detect_package_manager)
 
 	case "$pm" in
@@ -199,6 +217,18 @@ clone_or_update() {
 	url=$(repo_url "$name")
 	dest=$BUILD_ROOT/$name
 
+	if [ "$DRY_RUN" -eq 1 ]; then
+		if [ -e "$dest/.git" ]; then
+			log "Would use existing $name checkout at $dest"
+			if [ "$UPDATE_REPOS" -eq 1 ]; then
+				run git -C "$dest" pull --ff-only
+			fi
+		else
+			run git clone "$url" "$dest"
+		fi
+		return 0
+	fi
+
 	if [ -e "$dest/.git" ]; then
 		log "Using existing $name checkout"
 		if [ "$UPDATE_REPOS" -eq 1 ]; then
@@ -215,7 +245,7 @@ install_make_project() {
 	name=$1
 	dir=$BUILD_ROOT/$name
 
-	[ -d "$dir" ] || die "$name was not cloned into $dir"
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "$name was not cloned into $dir"
 
 	log "Building and installing $name"
 	run make -C "$dir" clean
@@ -224,13 +254,62 @@ install_make_project() {
 	run make -C "$dir" clean
 }
 
+uninstall_make_project() {
+	name=$1
+	dir=$BUILD_ROOT/$name
+
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "$name was not cloned into $dir"
+
+	log "Uninstalling $name"
+	with_install_privileges env TERMINFO="$PREFIX/share/terminfo" make -C "$dir" PREFIX="$PREFIX" uninstall
+}
+
 install_dotfiles() {
 	dir=$BUILD_ROOT/dots
 
-	[ -d "$dir" ] || die "dots was not cloned into $dir"
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "dots was not cloned into $dir"
 
 	log "Installing dotfiles into $DOTFILES_PREFIX"
 	run make -C "$dir" PREFIX="$DOTFILES_PREFIX" install
+}
+
+uninstall_dotfiles() {
+	dir=$BUILD_ROOT/dots
+
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "dots was not cloned into $dir"
+
+	log "Uninstalling dotfile symlinks from $DOTFILES_PREFIX"
+	run make -C "$dir" PREFIX="$DOTFILES_PREFIX" uninstall
+}
+
+list_modules() {
+	cat <<EOF
+Available modules:
+  --dots      dots
+  --wm        vdwm, dmenu
+  --sst       StealthStreamTerminal
+  --slstatus  slstatus
+  --slock     slock
+  --all       all modules
+EOF
+}
+
+selected_modules() {
+	if [ "$SELECT_DOTS" -eq 1 ]; then
+		printf '%s\n' dots
+	fi
+	if [ "$SELECT_WM" -eq 1 ]; then
+		printf '%s\n' dmenu vdwm
+	fi
+	if [ "$SELECT_SST" -eq 1 ]; then
+		printf '%s\n' StealthStreamTerminal
+	fi
+	if [ "$SELECT_SLSTATUS" -eq 1 ]; then
+		printf '%s\n' slstatus
+	fi
+	if [ "$SELECT_SLOCK" -eq 1 ]; then
+		printf '%s\n' slock
+	fi
 }
 
 select_all() {
@@ -292,6 +371,64 @@ install_selected_modules() {
 	fi
 }
 
+uninstall_selected_modules() {
+	if [ "$SELECT_WM" -eq 1 ] && confirm "Uninstall vdwm and dmenu from $PREFIX?" y; then
+		uninstall_make_project dmenu
+		uninstall_make_project vdwm
+	fi
+	if [ "$SELECT_SST" -eq 1 ] && confirm "Uninstall StealthStreamTerminal from $PREFIX?" y; then
+		uninstall_make_project StealthStreamTerminal
+	fi
+	if [ "$SELECT_SLSTATUS" -eq 1 ] && confirm "Uninstall slstatus from $PREFIX?" y; then
+		uninstall_make_project slstatus
+	fi
+	if [ "$SELECT_SLOCK" -eq 1 ] && confirm "Uninstall slock from $PREFIX?" y; then
+		uninstall_make_project slock
+	fi
+	if [ "$SELECT_DOTS" -eq 1 ] && confirm "Uninstall dotfile symlinks from $DOTFILES_PREFIX?" y; then
+		uninstall_dotfiles
+	fi
+}
+
+verify_command() {
+	cmd=$1
+	if command -v "$cmd" >/dev/null 2>&1; then
+		printf 'ok: %s\n' "$cmd"
+	else
+		printf 'missing: %s\n' "$cmd"
+	fi
+}
+
+verify_selected_modules() {
+	if [ "$DRY_RUN" -eq 1 ] || [ "$VERIFY_AFTER" -eq 0 ] || [ "$UNINSTALL" -eq 1 ]; then
+		return 0
+	fi
+
+	log "Verifying installed commands"
+	if [ "$SELECT_WM" -eq 1 ]; then
+		verify_command dmenu
+		verify_command vdwm
+	fi
+	if [ "$SELECT_SST" -eq 1 ]; then
+		verify_command st
+	fi
+	if [ "$SELECT_SLSTATUS" -eq 1 ]; then
+		verify_command slstatus
+	fi
+	if [ "$SELECT_SLOCK" -eq 1 ]; then
+		verify_command slock
+	fi
+}
+
+print_plan() {
+	log "Mode: $([ "$UNINSTALL" -eq 1 ] && printf uninstall || printf install)"
+	log "Selected modules:"
+	selected_modules | sed 's/^/  - /'
+	log "Build root: $BUILD_ROOT"
+	log "Install prefix: $PREFIX"
+	log "Dotfiles prefix: $DOTFILES_PREFIX"
+}
+
 parse_args() {
 	while [ "$#" -gt 0 ]; do
 		case "$1" in
@@ -315,6 +452,20 @@ parse_args() {
 				;;
 			-y|--yes)
 				ASSUME_YES=1
+				;;
+			--dry-run)
+				DRY_RUN=1
+				;;
+			--list)
+				LIST_ONLY=1
+				;;
+			--uninstall)
+				UNINSTALL=1
+				INSTALL_DEPS=0
+				VERIFY_AFTER=0
+				;;
+			--no-verify)
+				VERIFY_AFTER=0
 				;;
 			--no-deps)
 				INSTALL_DEPS=0
@@ -361,9 +512,18 @@ parse_args() {
 main() {
 	parse_args "$@"
 
-	log "Build root: $BUILD_ROOT"
-	log "Install prefix: $PREFIX"
-	log "Dotfiles prefix: $DOTFILES_PREFIX"
+	if [ "$LIST_ONLY" -eq 1 ]; then
+		list_modules
+		exit 0
+	fi
+
+	if [ "$DRY_RUN" -eq 1 ]; then
+		print_plan
+	else
+		log "Build root: $BUILD_ROOT"
+		log "Install prefix: $PREFIX"
+		log "Dotfiles prefix: $DOTFILES_PREFIX"
+	fi
 
 	if [ "$INSTALL_DEPS" -eq 1 ] && confirm "Install build dependencies with the system package manager?" y; then
 		install_dependencies
@@ -375,7 +535,12 @@ main() {
 	run mkdir -p "$BUILD_ROOT"
 
 	clone_selected_repos
-	install_selected_modules
+	if [ "$UNINSTALL" -eq 1 ]; then
+		uninstall_selected_modules
+	else
+		install_selected_modules
+		verify_selected_modules
+	fi
 
 	log "Done"
 }
