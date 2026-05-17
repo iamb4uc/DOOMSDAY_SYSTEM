@@ -1,0 +1,23 @@
+.Dd May 17, 2026
+.Dt SHADOWLOCK 1
+.Os
+.Sh NAME
+.Nm shadowlock
+.Nd DOOMSDAY lock-screen module
+.Sh DESCRIPTION
+.Nm
+is the named DOOMSDAY module for the customized
+.Xr slock 1
+build from
+.Lk https://github.com/iamb4uc/slock .
+It installs the X11 screen locker used by the desktop stack.
+.Sh INSTALL
+.Dl \&./install.sh --slock
+.Sh INSTALLED COMMANDS
+.Bl -tag -width "slock"
+.It Nm slock
+Screen locker executable.
+.El
+.Sh SEE ALSO
+.Xr doomsday-system 1 ,
+.Xr slock 1

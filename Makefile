@@ -12,6 +12,7 @@ help:
 check:
 	@sh -n install.sh
 	@if command -v shellcheck >/dev/null 2>&1; then shellcheck install.sh; fi
+	@if command -v mandoc >/dev/null 2>&1; then mandoc -Tascii man/*.1 >/dev/null; fi
 	@printf 'install.sh syntax ok\n'
 
 smoke: check
