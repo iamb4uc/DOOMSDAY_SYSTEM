@@ -1,0 +1,72 @@
+.Dd May 17, 2026
+.Dt DOOMSDAY-SYSTEM 1
+.Os
+.Sh NAME
+.Nm doomsday-system
+.Nd install the DOOMSDAY X11 desktop modules
+.Sh SYNOPSIS
+.Nm install.sh
+.Op Ar module
+.Op Ar option ...
+.Sh DESCRIPTION
+.Nm
+is a meta-installer for a small X11 desktop stack. It clones selected module
+repositories, builds the C tools, and installs dotfiles through their own
+Makefile.
+.Pp
+With no module flag, the installer defaults to
+.Fl -all .
+.Sh MODULES
+.Bl -tag -width "--slstatus"
+.It Fl -dots
+Install DoomDots.
+.It Fl -wm
+Install VeryDynamicWindowManager and DoomMenu.
+.It Fl -sst
+Install StealthStreamTerminal.
+.It Fl -slstatus
+Install SentinelStatus.
+.It Fl -slock
+Install ShadowLock.
+.It Fl -all
+Install every module.
+.El
+.Sh OPTIONS
+.Bl -tag -width "--dotfiles-prefix DIR"
+.It Fl y , Fl -yes
+Run non-interactively.
+.It Fl -dry-run
+Print planned actions without changing the system.
+.It Fl -list
+List modules and exit.
+.It Fl -uninstall
+Uninstall selected modules instead of installing them.
+.It Fl -no-verify
+Skip post-install command verification.
+.It Fl -no-deps
+Skip package-manager dependency installation.
+.It Fl -no-update
+Do not update existing module checkouts.
+.It Fl -build-root Ar DIR
+Clone and build modules under
+.Ar DIR .
+.It Fl -prefix Ar DIR
+Install compiled tools under
+.Ar DIR .
+.It Fl -dotfiles-prefix Ar DIR
+Install dotfile symlinks under
+.Ar DIR .
+.It Fl -repo-base Ar URL
+Use a different GitHub or Git-compatible repository base URL.
+.El
+.Sh EXAMPLES
+.Dl \&./install.sh --dry-run --all
+.Dl \&./install.sh --yes --wm --sst
+.Dl \&./install.sh --uninstall --slock
+.Sh SEE ALSO
+.Xr doomdots 1 ,
+.Xr verydynamicwindowmanager 1 ,
+.Xr doommenu 1 ,
+.Xr stealthstreamterminal 1 ,
+.Xr sentinelstatus 1 ,
+.Xr shadowlock 1

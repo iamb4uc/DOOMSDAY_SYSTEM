@@ -1,0 +1,24 @@
+.Dd May 17, 2026
+.Dt VERYDYNAMICWINDOWMANAGER 1
+.Os
+.Sh NAME
+.Nm verydynamicwindowmanager
+.Nd DOOMSDAY window-manager module
+.Sh DESCRIPTION
+.Nm
+is the named DOOMSDAY module for
+.Xr vdwm 1 ,
+the custom dynamic X11 window manager build. The installer pairs it with
+DoomMenu because the desktop workflow expects both the window manager and menu
+launcher.
+.Sh INSTALL
+.Dl \&./install.sh --wm
+.Sh INSTALLED COMMANDS
+.Bl -tag -width "vdwm"
+.It Nm vdwm
+Window manager executable.
+.El
+.Sh SEE ALSO
+.Xr doomsday-system 1 ,
+.Xr doommenu 1 ,
+.Xr vdwm 1

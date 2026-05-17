@@ -1,0 +1,27 @@
+.Dd May 17, 2026
+.Dt DOOMDOTS 1
+.Os
+.Sh NAME
+.Nm doomdots
+.Nd DOOMSDAY dotfile module
+.Sh DESCRIPTION
+.Nm
+is the dotfile module for the DOOMSDAY desktop stack. It installs shell, X11,
+editor, terminal, browser, media, and helper-script configuration by delegating
+to the
+.Pa dots
+repository Makefile.
+.Sh INSTALL
+.Dl \&./install.sh --dots
+.Sh UNINSTALL
+.Dl \&./install.sh --uninstall --dots
+.Sh FILES
+.Bl -tag -width "$DOTFILES_PREFIX"
+.It Pa $DOTFILES_PREFIX
+Destination for symlinked dotfiles. Defaults to
+.Ev HOME .
+.It Pa $BUILD_ROOT/dots
+Local checkout of the module repository.
+.El
+.Sh SEE ALSO
+.Xr doomsday-system 1

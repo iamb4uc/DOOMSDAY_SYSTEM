@@ -23,14 +23,14 @@ own installer.
 
 ## Modules
 
-| Flag | Installs | Source |
-| --- | --- | --- |
-| `--dots` | Shell, X11, editor, media, browser, and helper-script dotfiles | [`iamb4uc/dots`](https://github.com/iamb4uc/dots) |
-| `--wm` | `vdwm` plus `dmenu` for the window-manager workflow | [`iamb4uc/vdwm`](https://github.com/iamb4uc/vdwm), [`iamb4uc/dmenu`](https://github.com/iamb4uc/dmenu) |
-| `--sst` | StealthStreamTerminal, my `st` terminal build | [`iamb4uc/StealthStreamTerminal`](https://github.com/iamb4uc/StealthStreamTerminal) |
-| `--slstatus` | Status monitor for the window-manager bar | [`iamb4uc/slstatus`](https://github.com/iamb4uc/slstatus) |
-| `--slock` | Suckless screen locker build | [`iamb4uc/slock`](https://github.com/iamb4uc/slock) |
-| `--all` | Every module above | All sources above |
+| Flag | Module name | Installs | Source |
+| --- | --- | --- | --- |
+| `--dots` | DoomDots | Shell, X11, editor, media, browser, and helper-script dotfiles | [`iamb4uc/dots`](https://github.com/iamb4uc/dots) |
+| `--wm` | VeryDynamicWindowManager, DoomMenu | `vdwm` plus `dmenu` for the window-manager workflow | [`iamb4uc/vdwm`](https://github.com/iamb4uc/vdwm), [`iamb4uc/dmenu`](https://github.com/iamb4uc/dmenu) |
+| `--sst` | StealthStreamTerminal | `st` terminal build | [`iamb4uc/StealthStreamTerminal`](https://github.com/iamb4uc/StealthStreamTerminal) |
+| `--slstatus` | SentinelStatus | Status monitor for the window-manager bar | [`iamb4uc/slstatus`](https://github.com/iamb4uc/slstatus) |
+| `--slock` | ShadowLock | Screen locker build | [`iamb4uc/slock`](https://github.com/iamb4uc/slock) |
+| `--all` | All modules | Every module above | All sources above |
 
 With no module flag, `install.sh` defaults to `--all`.
 
@@ -84,6 +84,24 @@ cd DOOMSDAY_SYSTEM
 --dotfiles-prefix DIR  install dotfile symlinks under DIR, default $HOME
 --repo-base URL        use a different GitHub/user base URL
 ```
+
+## Manual Pages
+
+This meta-repo ships manual pages for the installer and each named module:
+
+```text
+doomsday-system(1)
+doomdots(1)
+verydynamicwindowmanager(1)
+doommenu(1)
+stealthstreamterminal(1)
+sentinelstatus(1)
+shadowlock(1)
+```
+
+The module repositories may also install their original upstream manual pages
+for the actual commands, such as `vdwm(1)`, `dmenu(1)`, `st(1)`, `slstatus(1)`,
+and `slock(1)`.
 
 The default build root is:
 
@@ -152,6 +170,7 @@ This repo should stay small:
 ```text
 README.md       project overview and usage
 install.sh      installer for all modules
+man/            meta manual pages
 .gitignore      ignores local module checkouts and build outputs
 ```
 

@@ -285,11 +285,11 @@ uninstall_dotfiles() {
 list_modules() {
 	cat <<EOF
 Available modules:
-  --dots      dots
-  --wm        vdwm, dmenu
-  --sst       StealthStreamTerminal
-  --slstatus  slstatus
-  --slock     slock
+  --dots      DoomDots (dots)
+  --wm        VeryDynamicWindowManager (vdwm), DoomMenu (dmenu)
+  --sst       StealthStreamTerminal (st)
+  --slstatus  SentinelStatus (slstatus)
+  --slock     ShadowLock (slock)
   --all       all modules
 EOF
 }

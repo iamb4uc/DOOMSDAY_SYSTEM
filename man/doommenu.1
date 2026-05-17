@@ -1,0 +1,31 @@
+.Dd May 17, 2026
+.Dt DOOMMENU 1
+.Os
+.Sh NAME
+.Nm doommenu
+.Nd DOOMSDAY menu module
+.Sh DESCRIPTION
+.Nm
+is the named DOOMSDAY module for the customized
+.Xr dmenu 1
+build. It is installed as part of
+.Fl -wm
+because the window-manager workflow uses it for launching commands and driving
+desktop actions.
+.Sh INSTALL
+.Dl \&./install.sh --wm
+.Sh INSTALLED COMMANDS
+.Bl -tag -width "dmenu_path"
+.It Nm dmenu
+Dynamic menu executable.
+.It Nm dmenu_run
+Launcher helper.
+.It Nm dmenu_path
+Path cache helper.
+.It Nm stest
+File-test helper used by dmenu scripts.
+.El
+.Sh SEE ALSO
+.Xr doomsday-system 1 ,
+.Xr verydynamicwindowmanager 1 ,
+.Xr dmenu 1
