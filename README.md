@@ -1,5 +1,11 @@
 # DOOMSDAY_SYSTEM
 
+```
+████▄  ▄████▄ ▄████▄ ██▄  ▄██ ▄█████ ████▄  ▄████▄ ██  ██   ▄█████ ██  ██ ▄█████ ██████ ██████ ██▄  ▄██ 
+██  ██ ██  ██ ██  ██ ██ ▀▀ ██ ▀▀▀▄▄▄ ██  ██ ██▄▄██  ▀██▀    ▀▀▀▄▄▄  ▀██▀  ▀▀▀▄▄▄   ██   ██▄▄   ██ ▀▀ ██ 
+████▀  ▀████▀ ▀████▀ ██    ██ █████▀ ████▀  ██  ██   ██     █████▀   ██   █████▀   ██   ██▄▄▄▄ ██    ██ 
+```
+
 [![check](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml/badge.svg)](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml)
 ![POSIX sh](https://img.shields.io/badge/shell-POSIX%20sh-222222)
 ![X11](https://img.shields.io/badge/platform-X11-444444)
