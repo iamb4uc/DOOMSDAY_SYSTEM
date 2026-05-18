@@ -20,6 +20,9 @@ With no module flag, the installer defaults to
 .Bl -tag -width "--status"
 .It Fl -dots
 Install DoomDots.
+.It Fl -desktop
+Install the interactive desktop modules: DoomWM, DoomMenu, DoomTerm,
+DoomStatus, and DoomLock.
 .It Fl -wm
 Install DoomWM.
 .It Fl -menu
@@ -74,8 +77,8 @@ Use a different GitHub or Git-compatible repository base URL.
 .El
 .Sh EXAMPLES
 .Dl \&./install.sh --dry-run --all
-.Dl \&./install.sh --yes --wm --menu --term
-.Dl \&./install.sh --uninstall --lock
+.Dl \&./install.sh --yes --desktop
+.Dl \&./install.sh --uninstall --desktop
 .Sh SEE ALSO
 .Xr doomdots 1 ,
 .Xr doomwm 1 ,

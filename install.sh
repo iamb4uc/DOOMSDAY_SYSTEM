@@ -17,6 +17,7 @@ LIST_ONLY=0
 UNINSTALL=0
 VERIFY_AFTER=1
 SELECT_DOTS=0
+SELECT_DESKTOP=0
 SELECT_WM=0
 SELECT_MENU=0
 SELECT_TERM=0
@@ -57,6 +58,7 @@ With no module selected, this defaults to --all.
 
 Modules:
       --dots            Install DoomDots
+      --desktop         Install the interactive desktop modules
       --wm              Install DoomWM
       --menu            Install DoomMenu
       --term            Install DoomTerm
@@ -90,7 +92,7 @@ Environment:
 Examples:
   ./install.sh
   ./install.sh --yes
-  ./install.sh --wm
+  ./install.sh --desktop
   ./install.sh --dry-run --all
   ./install.sh --list
   ./install.sh --yes --dots --term --no-deps
@@ -293,6 +295,7 @@ list_modules() {
 	cat <<EOF
 Available modules:
   --dots      DoomDots
+  --desktop   DoomWM, DoomMenu, DoomTerm, DoomStatus, DoomLock
   --wm        DoomWM
   --menu      DoomMenu
   --term      DoomTerm
@@ -323,19 +326,25 @@ selected_modules() {
 	fi
 }
 
-select_all() {
-	SELECT_DOTS=1
+select_desktop() {
+	SELECT_DESKTOP=1
 	SELECT_WM=1
 	SELECT_MENU=1
 	SELECT_TERM=1
 	SELECT_STATUS=1
 	SELECT_LOCK=1
+}
+
+select_all() {
+	SELECT_DOTS=1
+	select_desktop
 	SELECT_ANY=1
 }
 
 select_module() {
 	case "$1" in
 		dots) SELECT_DOTS=1 ;;
+		desktop) select_desktop ;;
 		wm) SELECT_WM=1 ;;
 		menu) SELECT_MENU=1 ;;
 		term) SELECT_TERM=1 ;;
@@ -431,10 +440,10 @@ verify_selected_modules() {
 		verify_command doommenu
 	fi
 	if [ "$SELECT_TERM" -eq 1 ]; then
-		verify_command doomterm
+		verify_command st
 	fi
 	if [ "$SELECT_STATUS" -eq 1 ]; then
-		verify_command doomstatus
+		verify_command slstatus
 	fi
 	if [ "$SELECT_LOCK" -eq 1 ]; then
 		verify_command doomlock
@@ -455,6 +464,9 @@ parse_args() {
 		case "$1" in
 			--dots)
 				select_module dots
+				;;
+			--desktop)
+				select_module desktop
 				;;
 			--wm)
 				select_module wm

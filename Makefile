@@ -1,12 +1,13 @@
 SHELL := /bin/sh
 
-.PHONY: help check smoke status
+.PHONY: help check smoke modules status
 
 help:
 	@printf '%s\n' \
 		'Targets:' \
 		'  make check   Syntax-check install.sh' \
 		'  make smoke   Run no-op installer smoke tests' \
+		'  make modules Run cross-repo module build checks' \
 		'  make status  Show git status'
 
 check:
@@ -18,9 +19,12 @@ check:
 smoke: check
 	@./install.sh --help >/dev/null
 	@./install.sh --list >/dev/null
-	@./install.sh --dry-run --no-deps --no-update --wm --menu --term --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
-	@./install.sh --dry-run --uninstall --wm --menu --term --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
+	@./install.sh --dry-run --no-deps --no-update --desktop --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
+	@./install.sh --dry-run --uninstall --desktop --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
 	@printf 'installer smoke tests ok\n'
+
+modules:
+	@./scripts/check-modules.sh
 
 status:
 	@git status --short
