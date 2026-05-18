@@ -64,8 +64,8 @@ done
 
 check_bin doomwm
 check_bin doommenu
-check_bin st
-check_bin slstatus
+check_bin doomterm
+check_bin doomstatus
 check_bin doomlock
 
 if [ -f "$BUILD_ROOT/$dot_module/Makefile" ]; then

@@ -29,8 +29,8 @@ own installer.
 | `--desktop` | Desktop bundle | DoomWM, DoomMenu, DoomTerm, DoomStatus, and DoomLock | All desktop module sources |
 | `--wm` | DoomWM | `doomwm` window manager | [`iamb4uc/DoomWM`](https://github.com/iamb4uc/DoomWM) |
 | `--menu` | DoomMenu | `doommenu`, `doommenu_run`, `doommenu_path`, and `stest` | [`iamb4uc/DoomMenu`](https://github.com/iamb4uc/DoomMenu) |
-| `--term` | DoomTerm | `st` terminal build | [`iamb4uc/DoomTerm`](https://github.com/iamb4uc/DoomTerm) |
-| `--status` | DoomStatus | `slstatus` bar status monitor | [`iamb4uc/DoomStatus`](https://github.com/iamb4uc/DoomStatus) |
+| `--term` | DoomTerm | `doomterm` terminal build | [`iamb4uc/DoomTerm`](https://github.com/iamb4uc/DoomTerm) |
+| `--status` | DoomStatus | `doomstatus` bar status monitor | [`iamb4uc/DoomStatus`](https://github.com/iamb4uc/DoomStatus) |
 | `--lock` | DoomLock | `doomlock` screen locker | [`iamb4uc/DoomLock`](https://github.com/iamb4uc/DoomLock) |
 | `--all` | All modules | Every module above | All sources above |
 
@@ -107,7 +107,7 @@ doomlock(1)
 ```
 
 The module repositories may also install command manual pages such as
-`doomwm(1)`, `doommenu(1)`, `st(1)`, `slstatus(1)`, and `doomlock(1)`.
+`doomwm(1)`, `doommenu(1)`, `doomterm(1)`, `doomstatus(1)`, and `doomlock(1)`.
 
 ## Merge Checks
 
@@ -118,7 +118,7 @@ Pull requests run:
 - manual page rendering with `mandoc`
 - installer dry-run smoke tests
 - cross-repo module checks that clone, build, install into a temporary prefix,
-  and verify `doomwm`, `doommenu`, `st`, `slstatus`, and `doomlock`
+  and verify `doomwm`, `doommenu`, `doomterm`, `doomstatus`, and `doomlock`
 - DoomDots `make lint`
 
 The default build root is:
@@ -167,7 +167,7 @@ Uninstall selected modules:
 ```
 
 By default, the installer verifies selected command modules after install:
-`doomwm`, `doommenu`, `st`, `slstatus`, and `doomlock`.
+`doomwm`, `doommenu`, `doomterm`, `doomstatus`, and `doomlock`.
 
 ## What It Changes
 

@@ -440,10 +440,10 @@ verify_selected_modules() {
 		verify_command doommenu
 	fi
 	if [ "$SELECT_TERM" -eq 1 ]; then
-		verify_command st
+		verify_command doomterm
 	fi
 	if [ "$SELECT_STATUS" -eq 1 ]; then
-		verify_command slstatus
+		verify_command doomstatus
 	fi
 	if [ "$SELECT_LOCK" -eq 1 ]; then
 		verify_command doomlock
