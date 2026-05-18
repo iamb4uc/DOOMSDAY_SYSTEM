@@ -18,9 +18,10 @@ UNINSTALL=0
 VERIFY_AFTER=1
 SELECT_DOTS=0
 SELECT_WM=0
-SELECT_SST=0
-SELECT_SLSTATUS=0
-SELECT_SLOCK=0
+SELECT_MENU=0
+SELECT_TERM=0
+SELECT_STATUS=0
+SELECT_LOCK=0
 SELECT_ANY=0
 
 SUDO=
@@ -55,12 +56,18 @@ Clone, build, and install the DOOMSDAY desktop pieces without git submodules.
 With no module selected, this defaults to --all.
 
 Modules:
-      --dots            Install dotfiles
-      --wm              Install vdwm and dmenu
-      --sst             Install StealthStreamTerminal
-      --slstatus        Install slstatus
-      --slock           Install slock
+      --dots            Install DoomDots
+      --wm              Install DoomWM
+      --menu            Install DoomMenu
+      --term            Install DoomTerm
+      --status          Install DoomStatus
+      --lock            Install DoomLock
       --all             Install every module (default)
+
+Legacy module aliases:
+      --sst             Alias for --term
+      --slstatus        Alias for --status
+      --slock           Alias for --lock
 
 Options:
   -y, --yes              Non-interactive mode; answer yes to prompts
@@ -86,7 +93,7 @@ Examples:
   ./install.sh --wm
   ./install.sh --dry-run --all
   ./install.sh --list
-  ./install.sh --yes --dots --sst --no-deps
+  ./install.sh --yes --dots --term --no-deps
 EOF
 }
 
@@ -265,18 +272,18 @@ uninstall_make_project() {
 }
 
 install_dotfiles() {
-	dir=$BUILD_ROOT/dots
+	dir=$BUILD_ROOT/DoomDots
 
-	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "dots was not cloned into $dir"
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "DoomDots was not cloned into $dir"
 
 	log "Installing dotfiles into $DOTFILES_PREFIX"
 	run make -C "$dir" PREFIX="$DOTFILES_PREFIX" install
 }
 
 uninstall_dotfiles() {
-	dir=$BUILD_ROOT/dots
+	dir=$BUILD_ROOT/DoomDots
 
-	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "dots was not cloned into $dir"
+	[ "$DRY_RUN" -eq 1 ] || [ -d "$dir" ] || die "DoomDots was not cloned into $dir"
 
 	log "Uninstalling dotfile symlinks from $DOTFILES_PREFIX"
 	run make -C "$dir" PREFIX="$DOTFILES_PREFIX" uninstall
@@ -285,39 +292,44 @@ uninstall_dotfiles() {
 list_modules() {
 	cat <<EOF
 Available modules:
-  --dots      DoomDots (dots)
-  --wm        VeryDynamicWindowManager (vdwm), DoomMenu (dmenu)
-  --sst       StealthStreamTerminal (st)
-  --slstatus  SentinelStatus (slstatus)
-  --slock     ShadowLock (slock)
+  --dots      DoomDots
+  --wm        DoomWM
+  --menu      DoomMenu
+  --term      DoomTerm
+  --status    DoomStatus
+  --lock      DoomLock
   --all       all modules
 EOF
 }
 
 selected_modules() {
 	if [ "$SELECT_DOTS" -eq 1 ]; then
-		printf '%s\n' dots
+		printf '%s\n' DoomDots
 	fi
 	if [ "$SELECT_WM" -eq 1 ]; then
-		printf '%s\n' dmenu vdwm
+		printf '%s\n' DoomWM
 	fi
-	if [ "$SELECT_SST" -eq 1 ]; then
-		printf '%s\n' StealthStreamTerminal
+	if [ "$SELECT_MENU" -eq 1 ]; then
+		printf '%s\n' DoomMenu
 	fi
-	if [ "$SELECT_SLSTATUS" -eq 1 ]; then
-		printf '%s\n' slstatus
+	if [ "$SELECT_TERM" -eq 1 ]; then
+		printf '%s\n' DoomTerm
 	fi
-	if [ "$SELECT_SLOCK" -eq 1 ]; then
-		printf '%s\n' slock
+	if [ "$SELECT_STATUS" -eq 1 ]; then
+		printf '%s\n' DoomStatus
+	fi
+	if [ "$SELECT_LOCK" -eq 1 ]; then
+		printf '%s\n' DoomLock
 	fi
 }
 
 select_all() {
 	SELECT_DOTS=1
 	SELECT_WM=1
-	SELECT_SST=1
-	SELECT_SLSTATUS=1
-	SELECT_SLOCK=1
+	SELECT_MENU=1
+	SELECT_TERM=1
+	SELECT_STATUS=1
+	SELECT_LOCK=1
 	SELECT_ANY=1
 }
 
@@ -325,9 +337,10 @@ select_module() {
 	case "$1" in
 		dots) SELECT_DOTS=1 ;;
 		wm) SELECT_WM=1 ;;
-		sst) SELECT_SST=1 ;;
-		slstatus) SELECT_SLSTATUS=1 ;;
-		slock) SELECT_SLOCK=1 ;;
+		menu) SELECT_MENU=1 ;;
+		term) SELECT_TERM=1 ;;
+		status) SELECT_STATUS=1 ;;
+		lock) SELECT_LOCK=1 ;;
 		all) select_all; return ;;
 	esac
 	SELECT_ANY=1
@@ -335,36 +348,40 @@ select_module() {
 
 clone_selected_repos() {
 	if [ "$SELECT_WM" -eq 1 ]; then
-		clone_or_update dmenu
-		clone_or_update vdwm
+		clone_or_update DoomWM
 	fi
-	if [ "$SELECT_SST" -eq 1 ]; then
-		clone_or_update StealthStreamTerminal
+	if [ "$SELECT_MENU" -eq 1 ]; then
+		clone_or_update DoomMenu
 	fi
-	if [ "$SELECT_SLSTATUS" -eq 1 ]; then
-		clone_or_update slstatus
+	if [ "$SELECT_TERM" -eq 1 ]; then
+		clone_or_update DoomTerm
 	fi
-	if [ "$SELECT_SLOCK" -eq 1 ]; then
-		clone_or_update slock
+	if [ "$SELECT_STATUS" -eq 1 ]; then
+		clone_or_update DoomStatus
+	fi
+	if [ "$SELECT_LOCK" -eq 1 ]; then
+		clone_or_update DoomLock
 	fi
 	if [ "$SELECT_DOTS" -eq 1 ]; then
-		clone_or_update dots
+		clone_or_update DoomDots
 	fi
 }
 
 install_selected_modules() {
-	if [ "$SELECT_WM" -eq 1 ] && confirm "Build and install vdwm and dmenu to $PREFIX?" y; then
-		install_make_project dmenu
-		install_make_project vdwm
+	if [ "$SELECT_WM" -eq 1 ] && confirm "Build and install DoomWM to $PREFIX?" y; then
+		install_make_project DoomWM
 	fi
-	if [ "$SELECT_SST" -eq 1 ] && confirm "Build and install StealthStreamTerminal to $PREFIX?" y; then
-		install_make_project StealthStreamTerminal
+	if [ "$SELECT_MENU" -eq 1 ] && confirm "Build and install DoomMenu to $PREFIX?" y; then
+		install_make_project DoomMenu
 	fi
-	if [ "$SELECT_SLSTATUS" -eq 1 ] && confirm "Build and install slstatus to $PREFIX?" y; then
-		install_make_project slstatus
+	if [ "$SELECT_TERM" -eq 1 ] && confirm "Build and install DoomTerm to $PREFIX?" y; then
+		install_make_project DoomTerm
 	fi
-	if [ "$SELECT_SLOCK" -eq 1 ] && confirm "Build and install slock to $PREFIX?" y; then
-		install_make_project slock
+	if [ "$SELECT_STATUS" -eq 1 ] && confirm "Build and install DoomStatus to $PREFIX?" y; then
+		install_make_project DoomStatus
+	fi
+	if [ "$SELECT_LOCK" -eq 1 ] && confirm "Build and install DoomLock to $PREFIX?" y; then
+		install_make_project DoomLock
 	fi
 	if [ "$SELECT_DOTS" -eq 1 ] && confirm "Install dotfile symlinks into $DOTFILES_PREFIX?" y; then
 		install_dotfiles
@@ -372,18 +389,20 @@ install_selected_modules() {
 }
 
 uninstall_selected_modules() {
-	if [ "$SELECT_WM" -eq 1 ] && confirm "Uninstall vdwm and dmenu from $PREFIX?" y; then
-		uninstall_make_project dmenu
-		uninstall_make_project vdwm
+	if [ "$SELECT_WM" -eq 1 ] && confirm "Uninstall DoomWM from $PREFIX?" y; then
+		uninstall_make_project DoomWM
 	fi
-	if [ "$SELECT_SST" -eq 1 ] && confirm "Uninstall StealthStreamTerminal from $PREFIX?" y; then
-		uninstall_make_project StealthStreamTerminal
+	if [ "$SELECT_MENU" -eq 1 ] && confirm "Uninstall DoomMenu from $PREFIX?" y; then
+		uninstall_make_project DoomMenu
 	fi
-	if [ "$SELECT_SLSTATUS" -eq 1 ] && confirm "Uninstall slstatus from $PREFIX?" y; then
-		uninstall_make_project slstatus
+	if [ "$SELECT_TERM" -eq 1 ] && confirm "Uninstall DoomTerm from $PREFIX?" y; then
+		uninstall_make_project DoomTerm
 	fi
-	if [ "$SELECT_SLOCK" -eq 1 ] && confirm "Uninstall slock from $PREFIX?" y; then
-		uninstall_make_project slock
+	if [ "$SELECT_STATUS" -eq 1 ] && confirm "Uninstall DoomStatus from $PREFIX?" y; then
+		uninstall_make_project DoomStatus
+	fi
+	if [ "$SELECT_LOCK" -eq 1 ] && confirm "Uninstall DoomLock from $PREFIX?" y; then
+		uninstall_make_project DoomLock
 	fi
 	if [ "$SELECT_DOTS" -eq 1 ] && confirm "Uninstall dotfile symlinks from $DOTFILES_PREFIX?" y; then
 		uninstall_dotfiles
@@ -406,17 +425,19 @@ verify_selected_modules() {
 
 	log "Verifying installed commands"
 	if [ "$SELECT_WM" -eq 1 ]; then
-		verify_command dmenu
-		verify_command vdwm
+		verify_command doomwm
 	fi
-	if [ "$SELECT_SST" -eq 1 ]; then
-		verify_command st
+	if [ "$SELECT_MENU" -eq 1 ]; then
+		verify_command doommenu
 	fi
-	if [ "$SELECT_SLSTATUS" -eq 1 ]; then
-		verify_command slstatus
+	if [ "$SELECT_TERM" -eq 1 ]; then
+		verify_command doomterm
 	fi
-	if [ "$SELECT_SLOCK" -eq 1 ]; then
-		verify_command slock
+	if [ "$SELECT_STATUS" -eq 1 ]; then
+		verify_command doomstatus
+	fi
+	if [ "$SELECT_LOCK" -eq 1 ]; then
+		verify_command doomlock
 	fi
 }
 
@@ -438,14 +459,17 @@ parse_args() {
 			--wm)
 				select_module wm
 				;;
-			--sst)
-				select_module sst
+			--menu)
+				select_module menu
 				;;
-			--slstatus)
-				select_module slstatus
+			--term|--sst)
+				select_module term
 				;;
-			--slock)
-				select_module slock
+			--status|--slstatus)
+				select_module status
+				;;
+			--lock|--slock)
+				select_module lock
 				;;
 			--all)
 				select_module all

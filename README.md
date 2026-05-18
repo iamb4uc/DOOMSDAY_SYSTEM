@@ -25,11 +25,12 @@ own installer.
 
 | Flag | Module name | Installs | Source |
 | --- | --- | --- | --- |
-| `--dots` | DoomDots | Shell, X11, editor, media, browser, and helper-script dotfiles | [`iamb4uc/dots`](https://github.com/iamb4uc/dots) |
-| `--wm` | VeryDynamicWindowManager, DoomMenu | `vdwm` plus `dmenu` for the window-manager workflow | [`iamb4uc/vdwm`](https://github.com/iamb4uc/vdwm), [`iamb4uc/dmenu`](https://github.com/iamb4uc/dmenu) |
-| `--sst` | StealthStreamTerminal | `st` terminal build | [`iamb4uc/StealthStreamTerminal`](https://github.com/iamb4uc/StealthStreamTerminal) |
-| `--slstatus` | SentinelStatus | Status monitor for the window-manager bar | [`iamb4uc/slstatus`](https://github.com/iamb4uc/slstatus) |
-| `--slock` | ShadowLock | Screen locker build | [`iamb4uc/slock`](https://github.com/iamb4uc/slock) |
+| `--dots` | DoomDots | Shell, X11, editor, media, browser, and helper-script dotfiles | [`iamb4uc/DoomDots`](https://github.com/iamb4uc/DoomDots) |
+| `--wm` | DoomWM | `doomwm` window manager | [`iamb4uc/DoomWM`](https://github.com/iamb4uc/DoomWM) |
+| `--menu` | DoomMenu | `doommenu`, `doommenu_run`, `doommenu_path`, and `stest` | [`iamb4uc/DoomMenu`](https://github.com/iamb4uc/DoomMenu) |
+| `--term` | DoomTerm | `doomterm` terminal build | [`iamb4uc/DoomTerm`](https://github.com/iamb4uc/DoomTerm) |
+| `--status` | DoomStatus | `doomstatus` bar status monitor | [`iamb4uc/DoomStatus`](https://github.com/iamb4uc/DoomStatus) |
+| `--lock` | DoomLock | `doomlock` screen locker | [`iamb4uc/DoomLock`](https://github.com/iamb4uc/DoomLock) |
 | `--all` | All modules | Every module above | All sources above |
 
 With no module flag, `install.sh` defaults to `--all`.
@@ -51,8 +52,8 @@ curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/instal
 Install only selected modules:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --wm
-curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --dots --sst
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --wm --menu
+curl -fsSL https://raw.githubusercontent.com/iamb4uc/DOOMSDAY_SYSTEM/main/install.sh | sh -s -- --dots --term
 ```
 
 Local checkout:
@@ -67,10 +68,11 @@ cd DOOMSDAY_SYSTEM
 
 ```text
 --dots                 install dotfiles
---wm                   install vdwm and dmenu
---sst                  install StealthStreamTerminal
---slstatus             install slstatus
---slock                install slock
+--wm                   install DoomWM
+--menu                 install DoomMenu
+--term                 install DoomTerm
+--status               install DoomStatus
+--lock                 install DoomLock
 --all                  install everything, also the default
 -y, --yes              run non-interactively
 --dry-run              print planned actions without changing the system
@@ -85,6 +87,9 @@ cd DOOMSDAY_SYSTEM
 --repo-base URL        use a different GitHub/user base URL
 ```
 
+Legacy aliases `--sst`, `--slstatus`, and `--slock` still work, but the
+preferred family flags are `--term`, `--status`, and `--lock`.
+
 ## Manual Pages
 
 This meta-repo ships manual pages for the installer and each named module:
@@ -92,16 +97,15 @@ This meta-repo ships manual pages for the installer and each named module:
 ```text
 doomsday-system(1)
 doomdots(1)
-verydynamicwindowmanager(1)
+doomwm(1)
 doommenu(1)
-stealthstreamterminal(1)
-sentinelstatus(1)
-shadowlock(1)
+doomterm(1)
+doomstatus(1)
+doomlock(1)
 ```
 
-The module repositories may also install their original upstream manual pages
-for the actual commands, such as `vdwm(1)`, `dmenu(1)`, `st(1)`, `slstatus(1)`,
-and `slock(1)`.
+The module repositories may also install command manual pages such as
+`doomwm(1)`, `doommenu(1)`, `doomterm(1)`, `doomstatus(1)`, and `doomlock(1)`.
 
 The default build root is:
 
@@ -145,11 +149,11 @@ List modules:
 Uninstall selected modules:
 
 ```sh
-./install.sh --uninstall --wm --sst
+./install.sh --uninstall --wm --menu --term
 ```
 
 By default, the installer verifies selected command modules after install:
-`dmenu`, `vdwm`, `st`, `slstatus`, and `slock`.
+`doomwm`, `doommenu`, `doomterm`, `doomstatus`, and `doomlock`.
 
 ## What It Changes
 

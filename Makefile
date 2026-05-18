@@ -18,8 +18,8 @@ check:
 smoke: check
 	@./install.sh --help >/dev/null
 	@./install.sh --list >/dev/null
-	@./install.sh --dry-run --no-deps --no-update --wm --sst --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
-	@./install.sh --dry-run --uninstall --wm --sst --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
+	@./install.sh --dry-run --no-deps --no-update --wm --menu --term --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
+	@./install.sh --dry-run --uninstall --wm --menu --term --build-root /tmp/doomsday-system-smoke --prefix /tmp/doomsday-system-prefix >/dev/null
 	@printf 'installer smoke tests ok\n'
 
 status:

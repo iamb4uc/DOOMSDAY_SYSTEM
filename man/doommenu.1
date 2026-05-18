@@ -7,25 +7,23 @@
 .Sh DESCRIPTION
 .Nm
 is the named DOOMSDAY module for the customized
-.Xr dmenu 1
-build. It is installed as part of
-.Fl -wm
-because the window-manager workflow uses it for launching commands and driving
-desktop actions.
+.Xr doommenu 1
+build. It is used with DoomWM for launching commands and driving desktop
+actions.
 .Sh INSTALL
-.Dl \&./install.sh --wm
+.Dl \&./install.sh --menu
 .Sh INSTALLED COMMANDS
-.Bl -tag -width "dmenu_path"
-.It Nm dmenu
+.Bl -tag -width "doommenu_path"
+.It Nm doommenu
 Dynamic menu executable.
-.It Nm dmenu_run
+.It Nm doommenu_run
 Launcher helper.
-.It Nm dmenu_path
+.It Nm doommenu_path
 Path cache helper.
 .It Nm stest
-File-test helper used by dmenu scripts.
+File-test helper used by doommenu scripts.
 .El
 .Sh SEE ALSO
 .Xr doomsday-system 1 ,
-.Xr verydynamicwindowmanager 1 ,
-.Xr dmenu 1
+.Xr doomwm 1 ,
+.Xr doommenu 1

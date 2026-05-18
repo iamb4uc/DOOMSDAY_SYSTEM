@@ -4,12 +4,12 @@ This file is the human-readable module map for `install.sh`.
 
 | Module name | Installer flag | Repository name | Installs | Install method |
 | --- | --- | --- | --- | --- |
-| DoomDots | `--dots` | `dots` | Dotfile symlinks | `make PREFIX="$DOTFILES_PREFIX" install` |
-| VeryDynamicWindowManager | `--wm` | `vdwm` | `vdwm` | `make PREFIX="$PREFIX" clean install` |
-| DoomMenu | `--wm` | `dmenu` | `dmenu`, `dmenu_run`, `dmenu_path`, `stest` | `make PREFIX="$PREFIX" clean install` |
-| StealthStreamTerminal | `--sst` | `StealthStreamTerminal` | `st` | `make PREFIX="$PREFIX" clean install` |
-| SentinelStatus | `--slstatus` | `slstatus` | `slstatus` | `make PREFIX="$PREFIX" clean install` |
-| ShadowLock | `--slock` | `slock` | `slock` | `make PREFIX="$PREFIX" clean install` |
+| DoomDots | `--dots` | `DoomDots` | Dotfile symlinks | `make PREFIX="$DOTFILES_PREFIX" install` |
+| DoomWM | `--wm` | `DoomWM` | `doomwm` | `make PREFIX="$PREFIX" clean install` |
+| DoomMenu | `--menu` | `DoomMenu` | `doommenu`, `doommenu_run`, `doommenu_path`, `stest` | `make PREFIX="$PREFIX" clean install` |
+| DoomTerm | `--term` | `DoomTerm` | `doomterm` | `make PREFIX="$PREFIX" clean install` |
+| DoomStatus | `--status` | `DoomStatus` | `doomstatus` | `make PREFIX="$PREFIX" clean install` |
+| DoomLock | `--lock` | `DoomLock` | `doomlock` | `make PREFIX="$PREFIX" clean install` |
 
-`--wm` intentionally installs both `vdwm` and `dmenu`, because the desktop
-workflow expects the menu alongside the window manager.
+Legacy aliases `--sst`, `--slstatus`, and `--slock` still work for older
+commands, but the preferred flags are `--term`, `--status`, and `--lock`.

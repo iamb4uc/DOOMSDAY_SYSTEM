@@ -17,20 +17,33 @@ Makefile.
 With no module flag, the installer defaults to
 .Fl -all .
 .Sh MODULES
-.Bl -tag -width "--slstatus"
+.Bl -tag -width "--status"
 .It Fl -dots
 Install DoomDots.
 .It Fl -wm
-Install VeryDynamicWindowManager and DoomMenu.
-.It Fl -sst
-Install StealthStreamTerminal.
-.It Fl -slstatus
-Install SentinelStatus.
-.It Fl -slock
-Install ShadowLock.
+Install DoomWM.
+.It Fl -menu
+Install DoomMenu.
+.It Fl -term
+Install DoomTerm.
+.It Fl -status
+Install DoomStatus.
+.It Fl -lock
+Install DoomLock.
 .It Fl -all
 Install every module.
 .El
+.Pp
+Legacy aliases
+.Fl -sst ,
+.Fl -slstatus ,
+and
+.Fl -slock
+map to
+.Fl -term ,
+.Fl -status ,
+and
+.Fl -lock .
 .Sh OPTIONS
 .Bl -tag -width "--dotfiles-prefix DIR"
 .It Fl y , Fl -yes
@@ -61,12 +74,12 @@ Use a different GitHub or Git-compatible repository base URL.
 .El
 .Sh EXAMPLES
 .Dl \&./install.sh --dry-run --all
-.Dl \&./install.sh --yes --wm --sst
-.Dl \&./install.sh --uninstall --slock
+.Dl \&./install.sh --yes --wm --menu --term
+.Dl \&./install.sh --uninstall --lock
 .Sh SEE ALSO
 .Xr doomdots 1 ,
-.Xr verydynamicwindowmanager 1 ,
+.Xr doomwm 1 ,
 .Xr doommenu 1 ,
-.Xr stealthstreamterminal 1 ,
-.Xr sentinelstatus 1 ,
-.Xr shadowlock 1
+.Xr doomterm 1 ,
+.Xr doomstatus 1 ,
+.Xr doomlock 1
