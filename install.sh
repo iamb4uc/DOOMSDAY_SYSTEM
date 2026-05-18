@@ -190,27 +190,27 @@ install_dependencies() {
 	case "$pm" in
 		xbps)
 			if [ "$ASSUME_YES" -eq 1 ]; then
-				as_root xbps-install -Sy git base-devel pkg-config libX11-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
+				as_root xbps-install -Sy git base-devel pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
 			else
-				as_root xbps-install -S git base-devel pkg-config libX11-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
+				as_root xbps-install -S git base-devel pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
 			fi
 			;;
 		apt)
 			as_root apt-get update
-			as_root apt-get install -y git build-essential pkg-config libx11-dev libxext-dev libxft-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libpam0g-dev ncurses-bin
+			as_root apt-get install -y git build-essential pkg-config libx11-dev libx11-xcb-dev libxcb-res0-dev libxext-dev libxft-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libpam0g-dev ncurses-bin
 			;;
 		pacman)
 			if [ "$ASSUME_YES" -eq 1 ]; then
-				as_root pacman -Syu --needed --noconfirm git base-devel pkgconf libx11 libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
+				as_root pacman -Syu --needed --noconfirm git base-devel pkgconf libx11 libxcb libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
 			else
-				as_root pacman -Syu --needed git base-devel pkgconf libx11 libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
+				as_root pacman -Syu --needed git base-devel pkgconf libx11 libxcb libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
 			fi
 			;;
 		dnf)
-			as_root dnf install -y git make gcc pkgconf-pkg-config libX11-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
+			as_root dnf install -y git make gcc pkgconf-pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
 			;;
 		*)
-			die "unsupported package manager; install git, make, cc, pkg-config, X11/Xext/Xft/Xinerama/Xrandr/Xrender/fontconfig/freetype/PAM headers, and ncurses/tic manually, then rerun with --no-deps"
+			die "unsupported package manager; install git, make, cc, pkg-config, X11/XCB/Xext/Xft/Xinerama/Xrandr/Xrender/fontconfig/freetype/PAM headers, and ncurses/tic manually, then rerun with --no-deps"
 			;;
 	esac
 }
