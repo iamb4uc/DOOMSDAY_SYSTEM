@@ -3,19 +3,25 @@ set -eu
 
 PROGRAM=${0##*/}
 DEFAULT_BUILD_ROOT="${XDG_CACHE_HOME:-$HOME/.cache}/doomsday-system"
+DEFAULT_PACKAGES_DIR=packages/void
+DEFAULT_ETC_ROOT=etc
 
 BUILD_ROOT=${BUILD_ROOT:-$DEFAULT_BUILD_ROOT}
 PREFIX=${PREFIX:-/usr/local}
 DOTFILES_PREFIX=${DOTFILES_PREFIX:-$HOME}
 REPO_BASE=${REPO_BASE:-https://github.com/iamb4uc}
+PACKAGES_DIR=${PACKAGES_DIR:-$DEFAULT_PACKAGES_DIR}
+ETC_ROOT=${ETC_ROOT:-$DEFAULT_ETC_ROOT}
 
 ASSUME_YES=0
 INSTALL_DEPS=1
+INSTALL_ETC=1
 UPDATE_REPOS=1
 DRY_RUN=0
 LIST_ONLY=0
 UNINSTALL=0
 VERIFY_AFTER=1
+SELECT_SYSTEM=0
 SELECT_DOTS=0
 SELECT_WM=0
 SELECT_MENU=0
@@ -52,10 +58,11 @@ usage() {
 	cat <<EOF
 Usage: $PROGRAM [module] [options]
 
-Clone, build, and install the DOOMSDAY desktop pieces without git submodules.
+Post-install a Void Linux system and the DOOMSDAY desktop pieces.
 With no module selected, this defaults to --all.
 
 Modules:
+      --system          Install Void packages and tracked /etc files
       --dots            Install DoomDots
       --desktop         Install the interactive desktop modules
       --wm              Install DoomWM
@@ -77,8 +84,11 @@ Options:
       --uninstall        Uninstall selected modules instead of installing
       --no-verify        Skip post-install command verification
       --no-deps          Skip dependency installation
+      --no-etc           Skip tracked /etc file installation
       --no-update        Do not git pull existing clones
       --build-root DIR   Clone/build repos under DIR
+      --packages-dir DIR Read Void package manifests from DIR
+      --etc-root DIR     Read tracked /etc files from DIR
       --prefix DIR       Install C projects under DIR (default: /usr/local)
       --dotfiles-prefix DIR
                          Install dotfile symlinks under DIR (default: \$HOME)
@@ -86,7 +96,7 @@ Options:
   -h, --help             Show this help
 
 Environment:
-  BUILD_ROOT, PREFIX, DOTFILES_PREFIX, REPO_BASE, SUDO
+  BUILD_ROOT, PACKAGES_DIR, ETC_ROOT, PREFIX, DOTFILES_PREFIX, REPO_BASE, SUDO
 
 Examples:
   ./install.sh
@@ -94,7 +104,7 @@ Examples:
   ./install.sh --desktop
   ./install.sh --dry-run --all
   ./install.sh --list
-  ./install.sh --yes --dots --term --no-deps
+  ./install.sh --yes --dots --term --no-deps --no-etc
 EOF
 }
 
@@ -165,53 +175,200 @@ with_install_privileges() {
 	fi
 }
 
-detect_package_manager() {
-	if command -v xbps-install >/dev/null 2>&1; then
-		printf '%s\n' xbps
-	elif command -v apt-get >/dev/null 2>&1; then
-		printf '%s\n' apt
-	elif command -v pacman >/dev/null 2>&1; then
-		printf '%s\n' pacman
-	elif command -v dnf >/dev/null 2>&1; then
-		printf '%s\n' dnf
-	else
-		printf '%s\n' unknown
+is_void_linux() {
+	[ -r /etc/os-release ] && grep -Eq '^(ID=void|DISTRIB_ID="?void"?)' /etc/os-release
+}
+
+require_void_linux() {
+	if [ "$DRY_RUN" -eq 1 ]; then
+		return 0
 	fi
+
+	is_void_linux || die "this installer is Void Linux exclusive"
+	need_cmd xbps-install
+}
+
+package_list() {
+	if [ -d "$PACKAGES_DIR" ]; then
+		find "$PACKAGES_DIR" -type f | sort | while IFS= read -r file; do
+			sed 's/#.*//;/^[[:space:]]*$/d' "$file"
+		done
+	elif [ "$PACKAGES_DIR" = "$DEFAULT_PACKAGES_DIR" ]; then
+		default_package_list
+	else
+		die "missing package manifest directory: $PACKAGES_DIR"
+	fi
+}
+
+default_package_list() {
+	cat <<'EOF'
+base-devel
+bash
+git
+make
+pkg-config
+shellcheck
+mdocml
+ncurses
+libX11-devel
+libxcb-devel
+libXext-devel
+libXft-devel
+libXinerama-devel
+libXrandr-devel
+libXrender-devel
+fontconfig-devel
+freetype-devel
+pam-devel
+xorg-minimal
+xinit
+dbus
+elogind
+NetworkManager
+pulseaudio
+xrandr
+xset
+setxkbmap
+xbacklight
+xwallpaper
+picom
+dunst
+redshift
+libnotify
+firefox
+thunderbird
+keepassxc
+obsidian
+ghostty
+qutebrowser
+zathura
+zathura-pdf-mupdf
+zathura-djvu
+zathura-ps
+htop
+pulsemixer
+ncmpcpp
+mpd
+mpc
+pamixer
+lf
+neovim
+tmux
+fzf
+ripgrep
+jq
+bat
+starship
+mpv
+nsxiv
+ImageMagick
+ffmpeg
+mediainfo
+simple-mtpfs
+cryptsetup
+xclip
+ncdu
+ueberzug
+ueberzugpp
+syncthing
+glow
+alacritty
+noto-fonts-ttf
+nerd-fonts
+EOF
 }
 
 install_dependencies() {
 	if [ "$DRY_RUN" -eq 1 ]; then
-		log "Would install build dependencies with $(detect_package_manager)"
+		log "Would install Void packages from $PACKAGES_DIR"
+		package_list | sed 's/^/  - /'
 		return 0
 	fi
 
-	pm=$(detect_package_manager)
+	require_void_linux
 
-	case "$pm" in
-		xbps)
-			if [ "$ASSUME_YES" -eq 1 ]; then
-				as_root xbps-install -Sy git base-devel pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
+	packages=$(package_list)
+	[ -n "$packages" ] || die "no packages found in $PACKAGES_DIR"
+
+	if [ "$ASSUME_YES" -eq 1 ]; then
+		# shellcheck disable=SC2086
+		as_root xbps-install -Sy $packages
+	else
+		# shellcheck disable=SC2086
+		as_root xbps-install -S $packages
+	fi
+}
+
+install_etc_overlay() {
+	[ "$INSTALL_ETC" -eq 1 ] || return 0
+	[ "$UNINSTALL" -eq 0 ] || return 0
+
+	if [ -d "$ETC_ROOT" ]; then
+		log "Installing tracked /etc files from $ETC_ROOT"
+		find "$ETC_ROOT" -type f | sort | while IFS= read -r src; do
+			rel=${src#"$ETC_ROOT"/}
+			dest=/etc/$rel
+			if [ "$DRY_RUN" -eq 1 ]; then
+				run install -Dm644 "$src" "$dest"
 			else
-				as_root xbps-install -S git base-devel pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
+				as_root install -Dm644 "$src" "$dest"
 			fi
+		done
+	elif [ "$ETC_ROOT" = "$DEFAULT_ETC_ROOT" ]; then
+		install_builtin_etc_overlay
+	fi
+}
+
+install_builtin_etc_overlay() {
+	log "Installing built-in /etc files"
+	install_builtin_etc_file doomsday-release /etc/doomsday-release
+	install_builtin_etc_file issue /etc/issue
+}
+
+install_builtin_etc_file() {
+	name=$1
+	dest=$2
+
+	if [ "$DRY_RUN" -eq 1 ]; then
+		run install -Dm644 "<built-in:$name>" "$dest"
+		return 0
+	fi
+
+	tmp=${TMPDIR:-/tmp}/doomsday-system.$name.$$
+	write_builtin_etc_file "$name" > "$tmp"
+	as_root install -Dm644 "$tmp" "$dest"
+	rm -f "$tmp"
+}
+
+write_builtin_etc_file() {
+	case "$1" in
+		doomsday-release)
+			cat <<'EOF'
+NAME="DOOMSDAY_SYSTEM"
+ID="doomsday-system"
+BASE_ID="void"
+PRETTY_NAME="DOOMSDAY_SYSTEM on Void Linux"
+EOF
 			;;
-		apt)
-			as_root apt-get update
-			as_root apt-get install -y git build-essential pkg-config libx11-dev libx11-xcb-dev libxcb-res0-dev libxext-dev libxft-dev libxinerama-dev libxrandr-dev libxrender-dev libfontconfig1-dev libfreetype6-dev libpam0g-dev ncurses-bin
+		issue)
+			cat <<'EOF'
+
+\e[0;32m
+▒▒▒▒▒▒▒▒▒▒▒▒ ░▀█▀░█▀█░█▄█░█▀▄░█░█░█░█░█▀▀░▀░█▀▀
+▒▒▒▒█▒▒█▒▒▒▒ ░░█░░█▀█░█░█░█▀▄░░▀█░█░█░█░░░░░▀▀█
+▒▒▒▒█▒▒█▒▒▒▒ ░▀▀▀░▀░▀░▀░▀░▀▀░░░░▀░▀▀▀░▀▀▀░░░▀▀▀
+▒▒▒▒▒▒▒▒▒▒▒▒ ░█▀▄░█▀█░█▀█░█▄█░█▀▀░█▀▄░█▀█░█░█
+▒█▒▒▒▒▒▒▒▒█▒ ░█░█░█░█░█░█░█░█░▀▀█░█░█░█▀█░░█░
+▒▒████████▒▒ ░▀▀░░▀▀▀░▀▀▀░▀░▀░▀▀▀░▀▀░░▀░▀░░▀░
+▒▒▒▒▒▒▒▒▒▒▒▒ ░█▀▀░█░█░█▀▀░▀█▀░█▀▀░█▄█
+THIS ISN'T A ░▀▀█░░█░░▀▀█░░█░░█▀▀░█░█
+A DRILL!!!!! ░▀▀▀░░▀░░▀▀▀░░▀░░▀▀▀░▀░▀
+\e[0m
+
+A HACKABLE LINUX ENVIRONMENT BASED ON \e[1;36mVOID LINUX\e[0m
+EOF
 			;;
-		pacman)
-			if [ "$ASSUME_YES" -eq 1 ]; then
-				as_root pacman -Syu --needed --noconfirm git base-devel pkgconf libx11 libxcb libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
-			else
-				as_root pacman -Syu --needed git base-devel pkgconf libx11 libxcb libxext libxft libxinerama libxrandr libxrender fontconfig freetype2 pam ncurses
-			fi
-			;;
-		dnf)
-			as_root dnf install -y git make gcc pkgconf-pkg-config libX11-devel libxcb-devel libXext-devel libXft-devel libXinerama-devel libXrandr-devel libXrender-devel fontconfig-devel freetype-devel pam-devel ncurses
-			;;
-		*)
-			die "unsupported package manager; install git, make, cc, pkg-config, X11/XCB/Xext/Xft/Xinerama/Xrandr/Xrender/fontconfig/freetype/PAM headers, and ncurses/tic manually, then rerun with --no-deps"
-			;;
+		*) die "unknown built-in /etc file: $1" ;;
 	esac
 }
 
@@ -293,6 +450,7 @@ uninstall_dotfiles() {
 list_modules() {
 	cat <<EOF
 Available modules:
+  --system    Void packages and tracked /etc files
   --dots      DoomDots
   --desktop   DoomWM, DoomMenu, DoomTerm, DoomStatus, DoomLock
   --wm        DoomWM
@@ -305,6 +463,9 @@ EOF
 }
 
 selected_modules() {
+	if [ "$SELECT_SYSTEM" -eq 1 ]; then
+		printf '%s\n' VoidSystem
+	fi
 	if [ "$SELECT_DOTS" -eq 1 ]; then
 		printf '%s\n' DoomDots
 	fi
@@ -334,6 +495,7 @@ select_desktop() {
 }
 
 select_all() {
+	SELECT_SYSTEM=1
 	SELECT_DOTS=1
 	select_desktop
 	SELECT_ANY=1
@@ -341,6 +503,7 @@ select_all() {
 
 select_module() {
 	case "$1" in
+		system) SELECT_SYSTEM=1 ;;
 		dots) SELECT_DOTS=1 ;;
 		desktop) select_desktop ;;
 		wm) SELECT_WM=1 ;;
@@ -453,6 +616,8 @@ print_plan() {
 	log "Selected modules:"
 	selected_modules | sed 's/^/  - /'
 	log "Build root: $BUILD_ROOT"
+	log "Package manifests: $PACKAGES_DIR"
+	log "Etc overlay: $ETC_ROOT"
 	log "Install prefix: $PREFIX"
 	log "Dotfiles prefix: $DOTFILES_PREFIX"
 }
@@ -460,6 +625,9 @@ print_plan() {
 parse_args() {
 	while [ "$#" -gt 0 ]; do
 		case "$1" in
+			--system)
+				select_module system
+				;;
 			--dots)
 				select_module dots
 				;;
@@ -504,12 +672,25 @@ parse_args() {
 			--no-deps)
 				INSTALL_DEPS=0
 				;;
+			--no-etc)
+				INSTALL_ETC=0
+				;;
 			--no-update)
 				UPDATE_REPOS=0
 				;;
 			--build-root)
 				[ "$#" -ge 2 ] || die "--build-root needs a directory"
 				BUILD_ROOT=$2
+				shift
+				;;
+			--packages-dir)
+				[ "$#" -ge 2 ] || die "--packages-dir needs a directory"
+				PACKAGES_DIR=$2
+				shift
+				;;
+			--etc-root)
+				[ "$#" -ge 2 ] || die "--etc-root needs a directory"
+				ETC_ROOT=$2
 				shift
 				;;
 			--prefix)
@@ -545,6 +726,7 @@ parse_args() {
 
 main() {
 	parse_args "$@"
+	require_void_linux
 
 	if [ "$LIST_ONLY" -eq 1 ]; then
 		list_modules
@@ -559,8 +741,12 @@ main() {
 		log "Dotfiles prefix: $DOTFILES_PREFIX"
 	fi
 
-	if [ "$INSTALL_DEPS" -eq 1 ] && confirm "Install build dependencies with the system package manager?" y; then
+	if [ "$INSTALL_DEPS" -eq 1 ] && confirm "Install Void packages from $PACKAGES_DIR?" y; then
 		install_dependencies
+	fi
+
+	if [ "$SELECT_SYSTEM" -eq 1 ] && confirm "Install tracked /etc files from $ETC_ROOT?" y; then
+		install_etc_overlay
 	fi
 
 	need_cmd git

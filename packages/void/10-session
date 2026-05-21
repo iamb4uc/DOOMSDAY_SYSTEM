@@ -1,0 +1,16 @@
+# X11 session and service base used by DoomDots and DoomWM.
+xorg-minimal
+xinit
+dbus
+elogind
+NetworkManager
+pulseaudio
+xrandr
+xset
+setxkbmap
+xbacklight
+xwallpaper
+picom
+dunst
+redshift
+libnotify

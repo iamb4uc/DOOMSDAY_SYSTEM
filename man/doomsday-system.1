@@ -3,21 +3,27 @@
 .Os
 .Sh NAME
 .Nm doomsday-system
-.Nd install the DOOMSDAY X11 desktop modules
+.Nd post-install a Void Linux DOOMSDAY desktop
 .Sh SYNOPSIS
 .Nm install.sh
 .Op Ar module
 .Op Ar option ...
 .Sh DESCRIPTION
 .Nm
-is a meta-installer for a small X11 desktop stack. It clones selected module
-repositories, builds the C tools, and installs dotfiles through their own
-Makefile.
+is a Void Linux post-install script for a small X11 desktop stack. It installs
+Void packages, installs tracked
+.Pa /etc
+files, clones selected module repositories, builds the C tools, and installs
+dotfiles through their own Makefile.
 .Pp
 With no module flag, the installer defaults to
 .Fl -all .
 .Sh MODULES
 .Bl -tag -width "--status"
+.It Fl -system
+Install Void packages and tracked
+.Pa /etc
+files.
 .It Fl -dots
 Install DoomDots.
 .It Fl -desktop
@@ -60,11 +66,23 @@ Uninstall selected modules instead of installing them.
 .It Fl -no-verify
 Skip post-install command verification.
 .It Fl -no-deps
-Skip package-manager dependency installation.
+Skip Void package installation.
+.It Fl -no-etc
+Skip tracked
+.Pa /etc
+file installation.
 .It Fl -no-update
 Do not update existing module checkouts.
 .It Fl -build-root Ar DIR
 Clone and build modules under
+.Ar DIR .
+.It Fl -packages-dir Ar DIR
+Read Void package manifests from
+.Ar DIR .
+.It Fl -etc-root Ar DIR
+Read tracked
+.Pa /etc
+files from
 .Ar DIR .
 .It Fl -prefix Ar DIR
 Install compiled tools under

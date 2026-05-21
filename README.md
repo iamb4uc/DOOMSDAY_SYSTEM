@@ -12,19 +12,23 @@
 
 [![check](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml/badge.svg)](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml)
 ![POSIX sh](https://img.shields.io/badge/shell-POSIX%20sh-222222)
-![X11](https://img.shields.io/badge/platform-X11-444444)
+![Void Linux](https://img.shields.io/badge/platform-Void%20Linux-478061)
+![X11](https://img.shields.io/badge/session-X11-444444)
 
-A one-command installer for my X11 desktop stack.
+A one-command Void Linux bootstrapper for a fresh post-install system.
 
 This repository is intentionally a meta-repo. It does not vendor the individual
 projects or require git submodules. The installer clones each selected module
-from GitHub, builds the suckless tools, and installs the dotfiles through their
-own installer.
+from GitHub, installs only the Void packages needed by those modules, builds the
+suckless tools, and installs the dotfiles through their own installer. It also
+applies the tracked `/etc` overlay so a fresh Void base install can be brought
+back to the same DOOMSDAY baseline with less manual setup.
 
 ## Modules
 
 | Flag | Module name | Installs | Source |
 | --- | --- | --- | --- |
+| `--system` | Void system | Package manifests and tracked `/etc` files | This repo |
 | `--dots` | DoomDots | Shell, X11, editor, media, browser, and helper-script dotfiles | [`iamb4uc/DoomDots`](https://github.com/iamb4uc/DoomDots) |
 | `--desktop` | Desktop bundle | DoomWM, DoomMenu, DoomTerm, DoomStatus, and DoomLock | All desktop module sources |
 | `--wm` | DoomWM | `doomwm` window manager | [`iamb4uc/DoomWM`](https://github.com/iamb4uc/DoomWM) |
@@ -68,6 +72,7 @@ cd DOOMSDAY_SYSTEM
 ## Installer Options
 
 ```text
+--system               install Void packages and tracked /etc files
 --dots                 install dotfiles
 --desktop              install the interactive desktop modules
 --wm                   install DoomWM
@@ -82,8 +87,11 @@ cd DOOMSDAY_SYSTEM
 --uninstall            uninstall selected modules
 --no-verify            skip post-install command verification
 --no-deps              skip package-manager dependency installation
+--no-etc               skip tracked /etc file installation
 --no-update            do not git pull existing module checkouts
 --build-root DIR       clone/build modules under DIR
+--packages-dir DIR     read Void package manifests from DIR
+--etc-root DIR         read tracked /etc files from DIR
 --prefix DIR           install C projects under DIR, default /usr/local
 --dotfiles-prefix DIR  install dotfile symlinks under DIR, default $HOME
 --repo-base URL        use a different GitHub/user base URL
@@ -109,9 +117,10 @@ doomlock(1)
 The module repositories may also install command manual pages such as
 `doomwm(1)`, `doommenu(1)`, `doomterm(1)`, `doomstatus(1)`, and `doomlock(1)`.
 
-## Merge Checks
+## CI Checks
 
-Pull requests run:
+Pull requests use a Void Linux container only as a test harness. The end goal of
+the repo is still the real-machine bootstrap flow above.
 
 - shell syntax checks for the installer
 - `shellcheck`, when available
@@ -127,24 +136,22 @@ The default build root is:
 ${XDG_CACHE_HOME:-$HOME/.cache}/doomsday-system
 ```
 
-## Supported Systems
+## Void System
 
-The installer knows how to install build dependencies on:
+This repo is Void Linux exclusive. The package manifests live in
+`packages/void`:
 
-- Void Linux with `xbps-install`
-- Debian and Ubuntu with `apt-get`
-- Arch Linux with `pacman`
-- Fedora with `dnf`
+- `00-build` has compiler, bash, git, shellcheck, mandoc, and X11/PAM headers.
+- `10-session` has the X11 session, service, audio, network, and compositor
+  packages used by DoomDots and DoomWM.
+- `20-workflow` has applications and CLI tools referenced by DoomWM bindings,
+  DoomDots scripts, and editor/media configs.
 
-Dependency installation can be skipped with `--no-deps` if the system is already
-prepared or if you prefer to install packages manually.
+Tracked `/etc` files live under `etc` and are installed to matching absolute
+paths. For example, `etc/issue` installs to `/etc/issue`.
 
-Platform notes:
-
-- [Void Linux](docs/void.md)
-- [Debian and Ubuntu](docs/debian.md)
-- [Arch Linux](docs/arch.md)
-- [Fedora](docs/fedora.md)
+Dependency installation can be skipped with `--no-deps`, and `/etc` installation
+can be skipped with `--no-etc`.
 
 ## Useful Commands
 
@@ -171,9 +178,11 @@ By default, the installer verifies selected command modules after install:
 
 ## What It Changes
 
-The script can make three kinds of changes:
+The script can make these kinds of changes:
 
 - clones module repositories into the build root
+- installs Void packages with `xbps-install`
+- installs tracked files from `etc` into `/etc`
 - installs compiled tools into `PREFIX`, usually `/usr/local`
 - symlinks dotfiles into `DOTFILES_PREFIX`, usually `$HOME`
 
@@ -188,6 +197,8 @@ This repo should stay small:
 ```text
 README.md       project overview and usage
 install.sh      installer for all modules
+packages/void/  Void package manifests
+etc/            tracked /etc overlay
 man/            meta manual pages
 .gitignore      ignores local module checkouts and build outputs
 ```
