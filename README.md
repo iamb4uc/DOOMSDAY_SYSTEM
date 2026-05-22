@@ -13,9 +13,11 @@
 [![check](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml/badge.svg)](https://github.com/iamb4uc/DOOMSDAY_SYSTEM/actions/workflows/check.yml)
 ![POSIX sh](https://img.shields.io/badge/shell-POSIX%20sh-222222)
 ![Void Linux](https://img.shields.io/badge/platform-Void%20Linux-478061)
+![glibc and musl](https://img.shields.io/badge/libc-glibc%20%2B%20musl-555555)
 ![X11](https://img.shields.io/badge/session-X11-444444)
 
 A one-command Void Linux bootstrapper for a fresh post-install system.
+It supports both official Void variants: glibc and musl.
 
 This repository is intentionally a meta-repo. It does not vendor the individual
 projects or require git submodules. The installer clones each selected module
@@ -119,12 +121,14 @@ The module repositories may also install command manual pages such as
 
 ## CI Checks
 
-Pull requests use a Void Linux container only as a test harness. The end goal of
-the repo is still the real-machine bootstrap flow above.
+Pull requests use Void Linux containers only as test harnesses. The end goal of
+the repo is still the real-machine bootstrap flow above. CI runs the bootstrap
+checks against both `voidlinux/voidlinux` and `voidlinux/voidlinux-musl`.
 
 - shell syntax checks for the installer
 - `shellcheck`, when available
 - manual page rendering with `mandoc`
+- package availability checks for every manifest entry
 - installer dry-run smoke tests
 - cross-repo module checks that clone, build, install into a temporary prefix,
   and verify `doomwm`, `doommenu`, `doomterm`, `doomstatus`, and `doomlock`
@@ -138,8 +142,8 @@ ${XDG_CACHE_HOME:-$HOME/.cache}/doomsday-system
 
 ## Void System
 
-This repo is Void Linux exclusive. The package manifests live in
-`packages/void`:
+This repo is Void Linux exclusive and targets both glibc and musl installs. The
+package manifests live in `packages/void`:
 
 - `00-build` has compiler, bash, git, shellcheck, mandoc, and X11/PAM headers.
 - `10-session` has the X11 session, service, audio, network, and compositor

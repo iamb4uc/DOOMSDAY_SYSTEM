@@ -9,29 +9,20 @@ docker run --rm \
 	"$image" \
 	/bin/sh -lc '
 		set -eu
+		arch=$(xbps-uhelper arch)
+		case "$arch" in
+			*-musl) repo=https://repo-default.voidlinux.org/current/musl ;;
+			*) repo=https://repo-default.voidlinux.org/current ;;
+		esac
+
 		mkdir -p /etc/xbps.d
-		printf "%s\n" repository=https://repo-default.voidlinux.org/current > /etc/xbps.d/00-repository-main.conf
+		printf "%s\n" "repository=$repo" > /etc/xbps.d/00-repository-main.conf
 		xbps-install -Syu xbps || true
 		xbps-install -Syu
-        xbps-install -Sy \
-          base-devel \
-          bash \
-          git \
-          make \
-			pkg-config \
-			shellcheck \
-			mdocml \
-			ncurses \
-			libX11-devel \
-			libxcb-devel \
-			libXext-devel \
-			libXft-devel \
-			libXinerama-devel \
-			libXrandr-devel \
-			libXrender-devel \
-			fontconfig-devel \
-			freetype-devel \
-			pam-devel
+		build_packages=$(sed "s/#.*//;/^[[:space:]]*$/d" packages/void/00-build)
+		# shellcheck disable=SC2086
+		xbps-install -Sy $build_packages
+		./scripts/check-void-packages.sh
 		make check
 		make smoke
 		BUILD_ROOT=/tmp/doomsday-system-modules \

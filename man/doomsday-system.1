@@ -10,8 +10,9 @@
 .Op Ar option ...
 .Sh DESCRIPTION
 .Nm
-is a Void Linux post-install script for a small X11 desktop stack. It installs
-Void packages, installs tracked
+is a Void Linux post-install script for a small X11 desktop stack. It supports
+both official Void libc variants, glibc and musl. It installs Void packages,
+installs tracked
 .Pa /etc
 files, clones selected module repositories, builds the C tools, and installs
 dotfiles through their own Makefile.

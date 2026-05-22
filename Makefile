@@ -1,6 +1,6 @@
 SHELL := /bin/sh
 
-.PHONY: help check smoke modules void status
+.PHONY: help check smoke modules void void-glibc void-musl status
 
 help:
 	@printf '%s\n' \
@@ -8,7 +8,9 @@ help:
 		'  make check   Syntax-check install.sh' \
 		'  make smoke   Run no-op installer smoke tests' \
 		'  make modules Run cross-repo module build checks' \
-		'  make void    Test the bootstrap checks in a Void Linux container' \
+		'  make void    Test bootstrap checks in glibc and musl Void containers' \
+		'  make void-glibc Test bootstrap checks in a glibc Void container' \
+		'  make void-musl  Test bootstrap checks in a musl Void container' \
 		'  make status  Show git status'
 
 check:
@@ -27,8 +29,13 @@ smoke: check
 modules:
 	@./scripts/check-modules.sh
 
-void:
+void: void-glibc void-musl
+
+void-glibc:
 	@./scripts/check-void-docker.sh
+
+void-musl:
+	@VOID_IMAGE=voidlinux/voidlinux-musl ./scripts/check-void-docker.sh
 
 status:
 	@git status --short

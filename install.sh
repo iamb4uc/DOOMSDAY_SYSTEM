@@ -238,7 +238,6 @@ libnotify
 firefox
 thunderbird
 keepassxc
-obsidian
 ghostty
 qutebrowser
 zathura
@@ -269,7 +268,6 @@ cryptsetup
 xclip
 ncdu
 ueberzug
-ueberzugpp
 syncthing
 glow
 alacritty
