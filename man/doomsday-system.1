@@ -3,34 +3,62 @@
 .Os
 .Sh NAME
 .Nm doomsday-system
-.Nd install the DOOMSDAY X11 desktop modules
+.Nd post-install a Void Linux DOOMSDAY desktop
 .Sh SYNOPSIS
 .Nm install.sh
 .Op Ar module
 .Op Ar option ...
 .Sh DESCRIPTION
 .Nm
-is a meta-installer for a small X11 desktop stack. It clones selected module
-repositories, builds the C tools, and installs dotfiles through their own
-Makefile.
+is a Void Linux post-install script for a small X11 desktop stack. It supports
+both official Void libc variants, glibc and musl. It installs Void packages,
+installs tracked
+.Pa /etc
+files, clones selected module repositories, builds the C tools, and installs
+dotfiles through their own Makefile.
+.Pp
+Before installing manifest packages, it updates
+.Nm xbps-install
+and the base Void system to avoid partial-upgrade dependency conflicts on fresh
+installs.
 .Pp
 With no module flag, the installer defaults to
 .Fl -all .
 .Sh MODULES
-.Bl -tag -width "--slstatus"
+.Bl -tag -width "--status"
+.It Fl -system
+Install Void packages and tracked
+.Pa /etc
+files.
 .It Fl -dots
 Install DoomDots.
+.It Fl -desktop
+Install the interactive desktop modules: DoomWM, DoomMenu, DoomTerm,
+DoomStatus, and DoomLock.
 .It Fl -wm
-Install VeryDynamicWindowManager and DoomMenu.
-.It Fl -sst
-Install StealthStreamTerminal.
-.It Fl -slstatus
-Install SentinelStatus.
-.It Fl -slock
-Install ShadowLock.
+Install DoomWM.
+.It Fl -menu
+Install DoomMenu.
+.It Fl -term
+Install DoomTerm.
+.It Fl -status
+Install DoomStatus.
+.It Fl -lock
+Install DoomLock.
 .It Fl -all
 Install every module.
 .El
+.Pp
+Legacy aliases
+.Fl -sst ,
+.Fl -slstatus ,
+and
+.Fl -slock
+map to
+.Fl -term ,
+.Fl -status ,
+and
+.Fl -lock .
 .Sh OPTIONS
 .Bl -tag -width "--dotfiles-prefix DIR"
 .It Fl y , Fl -yes
@@ -44,11 +72,23 @@ Uninstall selected modules instead of installing them.
 .It Fl -no-verify
 Skip post-install command verification.
 .It Fl -no-deps
-Skip package-manager dependency installation.
+Skip Void package installation.
+.It Fl -no-etc
+Skip tracked
+.Pa /etc
+file installation.
 .It Fl -no-update
 Do not update existing module checkouts.
 .It Fl -build-root Ar DIR
 Clone and build modules under
+.Ar DIR .
+.It Fl -packages-dir Ar DIR
+Read Void package manifests from
+.Ar DIR .
+.It Fl -etc-root Ar DIR
+Read tracked
+.Pa /etc
+files from
 .Ar DIR .
 .It Fl -prefix Ar DIR
 Install compiled tools under
@@ -61,12 +101,12 @@ Use a different GitHub or Git-compatible repository base URL.
 .El
 .Sh EXAMPLES
 .Dl \&./install.sh --dry-run --all
-.Dl \&./install.sh --yes --wm --sst
-.Dl \&./install.sh --uninstall --slock
+.Dl \&./install.sh --yes --desktop
+.Dl \&./install.sh --uninstall --desktop
 .Sh SEE ALSO
 .Xr doomdots 1 ,
-.Xr verydynamicwindowmanager 1 ,
+.Xr doomwm 1 ,
 .Xr doommenu 1 ,
-.Xr stealthstreamterminal 1 ,
-.Xr sentinelstatus 1 ,
-.Xr shadowlock 1
+.Xr doomterm 1 ,
+.Xr doomstatus 1 ,
+.Xr doomlock 1

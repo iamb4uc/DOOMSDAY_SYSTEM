@@ -8,17 +8,17 @@ permissions:
   contents: read
 
 jobs:
-  shell:
+  void:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        libc:
+          - glibc
+          - musl
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install shellcheck
-        run: sudo apt-get update && sudo apt-get install -y shellcheck mandoc
-
-      - name: Check
-        run: make check
-
-      - name: Smoke
-        run: make smoke
+      - name: Void checks
+        run: make void-${{ matrix.libc }}

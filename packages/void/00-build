@@ -1,0 +1,21 @@
+# Build and installer tooling.
+base-devel
+bash
+git
+make
+pkg-config
+shellcheck
+mdocml
+ncurses
+
+# DoomWM, DoomMenu, DoomTerm, DoomStatus, and DoomLock build headers.
+libX11-devel
+libxcb-devel
+libXext-devel
+libXft-devel
+libXinerama-devel
+libXrandr-devel
+libXrender-devel
+fontconfig-devel
+freetype-devel
+pam-devel
