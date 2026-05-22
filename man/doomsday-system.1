@@ -17,6 +17,11 @@ installs tracked
 files, clones selected module repositories, builds the C tools, and installs
 dotfiles through their own Makefile.
 .Pp
+Before installing manifest packages, it updates
+.Nm xbps-install
+and the base Void system to avoid partial-upgrade dependency conflicts on fresh
+installs.
+.Pp
 With no module flag, the installer defaults to
 .Fl -all .
 .Sh MODULES

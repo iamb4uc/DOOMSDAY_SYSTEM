@@ -278,6 +278,7 @@ EOF
 
 install_dependencies() {
 	if [ "$DRY_RUN" -eq 1 ]; then
+		log "Would update Void base system"
 		log "Would install Void packages from $PACKAGES_DIR"
 		package_list | sed 's/^/  - /'
 		return 0
@@ -288,6 +289,8 @@ install_dependencies() {
 	packages=$(package_list)
 	[ -n "$packages" ] || die "no packages found in $PACKAGES_DIR"
 
+	update_void_system
+
 	if [ "$ASSUME_YES" -eq 1 ]; then
 		# shellcheck disable=SC2086
 		as_root xbps-install -Sy $packages
@@ -295,6 +298,12 @@ install_dependencies() {
 		# shellcheck disable=SC2086
 		as_root xbps-install -S $packages
 	fi
+}
+
+update_void_system() {
+	log "Updating Void base system"
+	as_root xbps-install -Syu xbps || true
+	as_root xbps-install -Syu
 }
 
 install_etc_overlay() {

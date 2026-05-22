@@ -157,6 +157,10 @@ paths. For example, `etc/issue` installs to `/etc/issue`.
 Dependency installation can be skipped with `--no-deps`, and `/etc` installation
 can be skipped with `--no-etc`.
 
+Before installing the manifest packages, the bootstrap updates `xbps` and then
+updates the base Void system. This avoids partial-upgrade dependency conflicts
+on fresh installs.
+
 ## Useful Commands
 
 Preview an install:
