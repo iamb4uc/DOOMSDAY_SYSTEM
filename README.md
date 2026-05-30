@@ -119,6 +119,14 @@ doomlock(1)
 The module repositories may also install command manual pages such as
 `doomwm(1)`, `doommenu(1)`, `doomterm(1)`, `doomstatus(1)`, and `doomlock(1)`.
 
+## Docs
+
+- [Keybindings](docs/keybindings.md)
+- [Void setup notes](docs/void.md)
+- [Arch package notes](docs/arch.md)
+- [Debian package notes](docs/debian.md)
+- [Fedora package notes](docs/fedora.md)
+
 ## CI Checks
 
 Pull requests use Void Linux containers only as test harnesses. The end goal of
