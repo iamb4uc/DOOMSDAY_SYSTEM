@@ -17,6 +17,7 @@ pamixer
 lf
 neovim
 tmux
+zsh
 fzf
 ripgrep
 jq

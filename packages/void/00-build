@@ -5,6 +5,7 @@ git
 make
 pkg-config
 shellcheck
+zsh
 mdocml
 ncurses
 
