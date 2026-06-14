@@ -4,7 +4,9 @@ xinit
 dbus
 elogind
 NetworkManager
-pulseaudio
+pipewire
+wireplumber
+wireplumber-elogind
 xrandr
 xset
 setxkbmap
