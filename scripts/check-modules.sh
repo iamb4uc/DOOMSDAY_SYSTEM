@@ -2,6 +2,7 @@
 set -eu
 
 REPO_BASE=${REPO_BASE:-https://github.com/iamb4uc}
+REPO_BASE=${REPO_BASE%/}
 BUILD_ROOT=${BUILD_ROOT:-/tmp/doomsday-system-modules}
 PREFIX=${PREFIX:-/tmp/doomsday-system-prefix}
 DOTFILES_PREFIX=${DOTFILES_PREFIX:-/tmp/doomsday-system-home}
